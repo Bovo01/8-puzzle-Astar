@@ -64,7 +64,7 @@ namespace Astar
 
         public static EightPuzzle GeneratePuzzle()
         {
-            int[,] grid = (int[,]) State.GOAL.Clone();
+            int[,] grid = (int[,]) Goal.GOAL.Clone();
             Random rand = new Random();
             do {
                 Shuffle(rand, grid);
@@ -89,7 +89,7 @@ namespace Astar
         }
         private static bool IsSolvable(int[,] grid)
         {
-            return GetInvertions(grid) % 2 == State.GOAL_INVERTIONS_PARITY;
+            return GetInvertions(grid) % 2 == Goal.GOAL_INVERTIONS_PARITY;
         }
         private static void Shuffle<T>(Random random, T[,] array)
         {
@@ -108,7 +108,7 @@ namespace Astar
             }
         }
 
-        internal static int ManhattanDistance(int[,] grid)
+        internal int ManhattanDistance()
         {
             Position p;
             int h = 0;
@@ -116,7 +116,7 @@ namespace Astar
             {
                 for (int j = 0; j < grid.GetLength(1); j++)
                 {
-                    p = State.GetGoalPosition(grid[i, j]);
+                    p = Goal.GetGoalPosition(grid[i, j]);
                     h += Math.Abs(p.r - i) + Math.Abs(p.c - j);
                 }
             }
@@ -130,15 +130,11 @@ namespace Astar
             {
                 for (int j = 0; j < grid.GetLength(1); j++)
                 {
-                    p = State.GetGoalPosition(grid[i, j]);
+                    p = Goal.GetGoalPosition(grid[i, j]);
                     h = Math.Max(h, Math.Abs(p.r - i) + Math.Abs(p.c - j));
                 }
             }
             return h;
-        }
-        internal int ManhattanDistance()
-        {
-            return ManhattanDistance(grid);
         }
 
         public static string ToString(int[,] grid)

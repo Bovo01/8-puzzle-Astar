@@ -4,24 +4,46 @@ using Priority_Queue;
 
 namespace Astar
 {
+    public static class Goal
+    {
+        internal static readonly int[,] GOAL = GenerateGoal(3);
+        internal static readonly int GOAL_INVERTIONS_PARITY = EightPuzzle.GetInvertions(GOAL) % 2;
+        private static Position[]? GOAL_POSITIONS;
+
+        internal static Position GetGoalPosition(int val)
+        {
+            if (GOAL_POSITIONS == null)
+            {
+                // Genero l'array
+                GOAL_POSITIONS = new Position[GOAL.Length];
+                for (int i = 0; i < GOAL.GetLength(0); i++)
+                {
+                    for (int j = 0; j < GOAL.GetLength(1); j++)
+                    {
+                        GOAL_POSITIONS[GOAL[i, j]] = new Position(i, j);
+                    }
+                }
+            }
+            return GOAL_POSITIONS[val];
+        }
+        private static int[,] GenerateGoal(int dim)
+        {
+            if (dim < 1)
+                throw new Exception("The grid must be at least 1x1");
+            int[,] grid = new int[dim,dim];
+            for (int i = 0; i < dim; i++)
+            {
+                for (int j = 0; j < dim; j++)
+                {
+                    grid[i, j] = i * dim + j + 1;
+                }
+            }
+            grid[dim - 1, dim - 1] = 0;
+            return grid;
+        }
+    }
     internal class State : FastPriorityQueueNode
     {
-        internal static readonly int[,] GOAL =
-        {
-            {1, 2, 3 },
-            {4, 5, 6 },
-            {7, 8, 0 },
-        };
-        /*internal static readonly int[,] GOAL =
-        {
-            {1, 2, 3, 4 },
-            {5, 6, 7, 8 },
-            {9, 10, 11, 12 },
-            {13, 14, 15, 0 }
-        };*/
-        internal static readonly int GOAL_INVERTIONS_PARITY = EightPuzzle.GetInvertions(GOAL) % 2;
-        static Position[]? GOAL_POSITIONS;
-
         internal EightPuzzle puzzle;
         internal int currCost;
         internal List<Action> moves;
@@ -46,22 +68,6 @@ namespace Astar
         {
             return currCost + Heuristic(); // A*
         }
-        internal static Position GetGoalPosition(int val)
-        {
-            if (GOAL_POSITIONS == null)
-            {
-                // Genero l'array
-                GOAL_POSITIONS = new Position[GOAL.Length];
-                for (int i = 0; i < GOAL.GetLength(0); i++)
-                {
-                    for (int j = 0; j < GOAL.GetLength(1); j++)
-                    {
-                        GOAL_POSITIONS[GOAL[i, j]] = new Position(i, j);
-                    }
-                }
-            }
-            return GOAL_POSITIONS[val];
-        }
         internal List<Action> GetActions()
         {
             return puzzle.GetActions();
@@ -75,7 +81,7 @@ namespace Astar
         }
         internal bool IsGoal()
         {
-            return GOAL.Cast<int>().SequenceEqual(puzzle.grid.Cast<int>());
+            return Goal.GOAL.Cast<int>().SequenceEqual(puzzle.grid.Cast<int>());
         }
         public void Report()
         {
@@ -83,7 +89,7 @@ namespace Astar
             puzzle.PrintPuzzle();
             Console.WriteLine("\nTotal moves: " + currCost);
             Console.Write("\nMoves to reach solution:\n");
-            Console.WriteLine( string.Join(',', moves) );
+            Console.WriteLine( string.Join(", ", moves) );
         }
     }
 
